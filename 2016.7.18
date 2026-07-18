@@ -1,0 +1,126 @@
+2016.7.18学习日记
+第一部分：宏观 — TGA+RRP+准备金联动
+TGA（Treasury General Account / 财政部一般账户）
+RRP（Overnight Reverse Repurchase Agreement / 隔夜逆回购协议）
+准备金（Bank Reserves / 银行准备金）
+三个账户的正确框架：
+Fed负债端的完整结构——准备金 + TGA + RRP + 流通中现金（约2.47万亿美元）+ 其他小额项
+L = Res + TGA + RRP + C + O (L：美联储总负债；Res：银行准备金；C：流通现金；O：其余小额负债项)
+短期差分公式（C 视作常数，ΔC ≈ 0，忽略小额项变动 ΔO ≈ 0）
+ΔRes ≈ -ΔTGA - ΔRRP
+文字对应公式逻辑
+	1.	ΔTGA>0（TGA 上升），会压低准备金，收紧流动性
+	2.	ΔRRP<0（RRP 下降），-ΔRRP>0，抬升准备金，释放流动性
+	3.	准备金最终增减，由 ΔTGA、ΔRRP 两者变动绝对值大小决定
+短期视角下的核心逻辑：因为流通现金短期内变化缓慢，可以当作常量处理。所以准备金的变化量约等于负的TGA变化量减去RRP变化量，方向关系成立：TGA上升抽走流动性，RRP下降释放流动性，准备金变化取决于两者谁变动的幅度更大。但绝对数值上不能等同于总负债。
+2022-2023年QT期间的真实案例：
+2023年6月债务上限解决后，财政部大规模发债补充TGA。TGA从约500-800亿美元回升到约8000亿美元（2023年Q4峰值）。RRP从约2.2万亿美元（2023年3月峰值）下降到约1.2-1.5万亿美元（2023年末）。准备金并非完全持平，而是温和下降——RRP释放的资金虽然缓冲了TGA抽走的大部分流动性，但并没有完全抵消全部影响。
+这个案例的关键教学意义：RRP充当了缓冲池。没有RRP的缓冲，TGA上升8000亿会直接导致准备金大幅下降，SOFR会显著承压上升。正是因为RRP在同步下降释放流动性，准备金才只温和下降。
+2024年至今，RRP接近0（缓冲耗尽），TGA的任何变动直接传导到准备金，SOFR对准备金变动的敏感度大幅提高。
+SOFR与IORB的正确判断方法：
+SOFR天然就在IORB附近甚至略低几个基点运行——因为非银机构无法存入美联储吃IORB，它们融出资金时接受的利率天然低于IORB。所以"SOFR低于IORB"是常态，不代表准备金充裕。
+真正收紧的信号是：SOFR持续靠近或触及IORB并出现正溢价，或者月末/季末出现尾盘跳升。此时说明准备金不足、银行间借钱紧张。
+SOFR中位数与IORB的偏离方向才是流动性松紧的指标：
+SOFR稳定在IORB下方几个基点、贴近ON RRP一侧 → 准备金充裕
+SOFR持续位于IORB附近甚至短暂突破IORB → 准备金偏紧
+SOFR在非季末时段大幅突破IORB → 结构性紧张
+
+轻松理解的炒菜类比：
+美联储的资产负债表就像一家厨房。锅里的汤（准备金）只是一部分。旁边还有一个大水桶（流通现金，约2.47万亿美元）——这个桶是固定的，不太会变。TGA是一个水壶：注水（财政部花钱）时汤变多，抽水（收税/发债）时汤变少。RRP是旁边一个蓄水池：蓄水池放水到锅里（RRP下降）时汤变多，抽到蓄水池里（RRP上升）时汤变少。以前蓄水池水多的时候（RRP 2.2万亿），水壶抽水可以从蓄水池补，锅里汤变化不大。现在蓄水池快干了（RRP约3500亿且主要是外国央行部分），水壶一抽水锅里的汤就直接少。SOFR就像温度计——汤多了温度低（利率低），汤少了温度升（利率高），持续升到冒烟（突破IORB）就是快干了。
+
+第二部分：加密 — MEV与做市商
+MEV（Maximal Extractable Value / 最大可提取价值）是指区块生产者（矿工/验证者）通过在区块内重排序、插入或审查交易来提取的额外价值。2019年Phil Daian等提出时原名Miner Extractable Value，2021年以太坊转PoS前后社区共识改为Maximal Extractable Value以保留缩写MEV但兼容权益证明链。核心思想不变：交易被打包进区块的顺序有经济价值，拥有排序权的区块生产者可以利用这个权力变现。
+
+三种主要类型（正确分类）：
+前置抢先（Front-running）——包含三明治攻击作为子类
+MEV机器人监测到你的待处理交易后，把自己的交易排在你前面执行。最常见的子类是三明治攻击：机器人发现你的大额买入交易后，在你之前先买入推高价格，然后在你成交之后立即卖出，你被夹在中间。三明治攻击之所以能成立，依赖的是AMM（自动做市商）的自动滑价机制——你的大单按公式逐档成交，价格被一步步推高，为前面的抢跑者创造了退出空间。
+
+后置尾随（Back-running）
+机器人在你的大额交易之后立即执行交易，利用你的交易造成的短暂价格冲击。例如你在Uniswap大量买入推高了ETH价格，机器人立即跟买以博取短期惯性收益。
+
+清算/跨池套利MEV
+监控链上借贷协议的清算线（如Aave），在借款人的抵押率跌破阈值时抢先清算，获取清算奖金。或者在不同DEX之间发现价差后套利。
+
+与做市商的关系：
+HyperLiquid是一个链上CLOB（中央限价订单簿），与AMM有本质区别。在纯CLOB上，经典三明治攻击并不直接适用——因为限价单不会自动产生滑点，系统按价格-时间优先原则撮合，不会在mempool中被夹击。
+
+在HyperLiquid做市时的真实MEV风险是：
+风险一：连续扫单边限价单制造库存敞口
+MEV机器人发现你的报价深度后，可以连续吃掉你单侧的限价单（比如连续吃你的买单），迫使你积累大量库存敞口，然后在价格向不利方向移动时获利。这与你在Day5学的毒性订单流直接相关——毒性高的订单流意味着对方可能在利用你的报价深度建立头寸。
+风险二：Oracle报价延迟套利
+HyperLiquid使用Oracle价格作为清算和爆仓参考。如果外部市场价格快速变动而Oracle价格更新滞后，MEV机器人可以按Oracle旧价与你的挂单成交，然后等待Oracle更新后获利退出。这就是为什么波动率越高、价差应该越宽。
+风险三：AMM路由流量被Front-run
+如果你同时在AMM池提供流动性，你的限价单可能被AMM路由到订单簿的流量所夹击。
+
+防护措施（基于HyperLiquid当前的状态）：
+目前HyperLiquid暂无私密订单流通道或延迟结算选项。防护主要依赖报价引擎本身的参数控制：价差/Toxicity自动调整——toxicity信号在CLOB环境下同样有效，当检测到订单流密度异常上升时自动拉宽价差
+最小挂单量设置——避免小量试探发现你的报价深度
+挂单粒度控制——不要把全部深度集中在一两档上，分散报价防止被一次性扫光
+如果HyperLiquid后续开放RFQ或Private Relay渠道，届时可切换使用
+
+模拟三明治攻击Sandwich Attack的代码：
+import random
+import statistics
+
+def simulate_sandwich(
+    token_price=100.0,
+    user_size=10.0,
+    slippage=0.005,
+    mev_advance=0.002,
+    mev_sell_slip=0.001
+):
+    max_price = token_price * (1 + slippage)
+    mev_buy_price = token_price * (1 + mev_advance)
+    mev_buy_cost = mev_buy_price * user_size
+    user_fill_price = mev_buy_price * (1 + mev_advance)
+    user_cost = user_fill_price * user_size
+    mev_sell_price = user_fill_price * (1 - mev_sell_slip)
+    mev_revenue = mev_sell_price * user_size
+    mev_profit = mev_revenue - mev_buy_cost
+    user_extra = user_cost - (token_price * user_size)
+    return {
+        "当前价": token_price, "用户购买量": user_size,
+        "MEV买入价": round(mev_buy_price, 2),
+        "用户成交价": round(user_fill_price, 2),
+        "MEV卖出价": round(mev_sell_price, 2),
+        "MEV利润": round(mev_profit, 2),
+        "用户多付": round(user_extra, 2),
+        "用户总成本": round(user_cost, 2)
+    }
+
+def batch_simulation(trials=1000):
+    results = []
+    for _ in range(trials):
+        price = random.uniform(10, 500)
+        size = random.uniform(1, 50)
+        slip = random.uniform(0.001, 0.02)
+        adv = random.uniform(0.0005, 0.005) #mev_advance=adv
+        sell_slip = random.uniform(0.0005, 0.003)
+        r = simulate_sandwich(
+            token_price=price, user_size=size,
+            slippage=slip, mev_advance=adv,
+            mev_sell_slip=sell_slip
+        )
+        results.append(r["MEV利润"])
+    print("模拟次数:", trials)
+    print("MEV利润均值:", round(statistics.mean(results), 2))
+    print("MEV利润中位数:", round(statistics.median(results), 2))
+    print("MEV利润最大:", round(max(results), 2))
+    print("MEV利润最小:", round(min(results), 2))
+
+r = simulate_sandwich()
+for k, v in r.items():
+    print(k + ":", v)
+print()
+batch_simulation(1000)
+
+代码说明：
+语法
+1.random.uniform 函数用于生成指定最小值和最大值之间的随机小数，第一个参数为区间下限，第二个参数为区间上限
+2.for 循环配合 range 可以控制代码重复执行固定次数，循环变量仅占位不参与计算时统一使用下划线代替，列表使用中括号创建空容器，列表 append 方法能够在列表末尾追加新的数据
+3.statistics.mean 用于计算一组数字的算术平均值，总和除以样本数量，statistics.median 用于计算一组数字的中位数，不受极端高低数值干扰
+内容
+simulate_sandwich模拟AMM环境下的经典三明治攻击流程：MEV机器人先买入推价0.2%，用户成交价因此被推高到约100.4（两次推价），机器人卖出时滑掉0.1%。利润=卖出收入-买入成本。batch_simulation用1000次随机参数模拟（价格10-500、成交量1-50、滑点0.1%-2%、推价0.05%-0.5%）给出利润分布统计。注意最小值为负——MEV并非稳赚，价格反方向波动时机器人也亏。
+
+对做市商的启示：
+在CLOB环境下，真实风险是毒性订单流（连续扫单积累库存敞口）和Oracle延迟套利。核心应对策略不变——毒性高的时候拉宽价差，把价差和toxicity信号联动。
